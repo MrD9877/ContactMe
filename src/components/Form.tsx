@@ -2,9 +2,12 @@
 import { Auth, signOut } from "firebase/auth";
 import { House, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function Form({ signInGoogle, auth }: { signInGoogle: () => Promise<void>; auth: Auth }) {
+export default function Form({ signInGoogle, auth, makeUserAdmin, disable }: { signInGoogle: () => Promise<void>; auth: Auth; makeUserAdmin: (key: string) => Promise<void>; disable: boolean }) {
   const router = useRouter();
+  const [key, setKey] = useState("");
+
   return (
     <div>
       <form className="form">
@@ -21,7 +24,7 @@ export default function Form({ signInGoogle, auth }: { signInGoogle: () => Promi
           </svg>
           Continue with Google
         </button>
-        {auth?.currentUser && (
+        {auth && auth.currentUser && (
           <>
             <button onClick={() => router.push("/")} className="oauthButton bg-green-400 text-creamBackground" type="button">
               <House className="icon" />
@@ -36,9 +39,9 @@ export default function Form({ signInGoogle, auth }: { signInGoogle: () => Promi
               <span>OR</span>
               <div></div>
             </div>
-            <input type="password" placeholder={`KEY 🔑`} name="email" />
-            <button className="oauthButton" type="button">
-              GO Admin
+            <input value={key} onChange={(e) => setKey(e.target.value)} type="password" placeholder={`KEY 🔑`} name="email" />
+            <button disabled={disable} onClick={() => makeUserAdmin(key)} className="oauthButton" type="button">
+              {disable ? "Please wait" : "GO Admin"}
               <svg className="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m6 17 5-5-5-5"></path>
                 <path d="m13 17 5-5-5-5"></path>

@@ -1,3 +1,5 @@
+import { toast } from "sonner";
+
 export const copyToClipboard = (text: string) => {
   if (navigator.clipboard && window.isSecureContext) {
     return navigator.clipboard.writeText(text);
@@ -14,8 +16,8 @@ export const copyToClipboard = (text: string) => {
 
   try {
     document.execCommand("copy");
-  } catch (err) {
-    console.error("Fallback copy failed", err);
+  } catch {
+    toast("Fallback copy failed");
   }
 
   document.body.removeChild(textarea);

@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { Auth, browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
+import { Auth, browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence } from "firebase/auth";
 import { Firestore, getFirestore } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
@@ -23,10 +23,18 @@ export default function useFirebase() {
     const fireBaseApp = initializeApp(firebaseConfig);
     setFireBaseApp(fireBaseApp);
     setFireStoreDB(getFirestore(fireBaseApp));
-    const auth = getAuth(fireBaseApp);
-    auth.languageCode = "it";
-    setPersistence(auth, browserLocalPersistence);
-    setauth(auth);
+    const authInstance = getAuth(fireBaseApp);
+    authInstance.languageCode = "it";
+    setPersistence(authInstance, browserLocalPersistence);
+
+    const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+      if (user) {
+        setauth(authInstance); // ensure latest auth state
+      } else {
+        setauth(authInstance); // or null if you want to unset
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   return { auth, fireStoreDB, fireBaseApp };
